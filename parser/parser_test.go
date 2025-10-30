@@ -80,7 +80,7 @@ func TestParseLogFilesValidFile(t *testing.T) {
 	}
 }
 
-func TestParseLogFilesInvalidDirectory(t *testing.T) {
+func TestParseLogFilesInvalidDirectoryPath(t *testing.T) {
 	path := "../logg"
 	_, err := ParseLogFiles(path)
 	if err == nil {
