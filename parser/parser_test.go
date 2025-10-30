@@ -42,3 +42,15 @@ func TestParserLogEntry(t *testing.T) {
 	}
 
 }
+
+func TestParseLogFiles(t *testing.T) {
+	entries, err := ParseLogFiles("/home/navaneeth/project_go/logs")
+
+	if err != nil {
+		t.Fatalf("Expected no error, got:%v", err)
+	}
+
+	if len(entries) == 0 {
+		t.Fatalf("Expected some log entries, but got 0")
+	}
+}
