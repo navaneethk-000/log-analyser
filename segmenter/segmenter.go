@@ -3,6 +3,7 @@ package segmenter
 import (
 	"bufio"
 	"fmt"
+	"log_parser/indexer"
 	"log_parser/model"
 	"log_parser/parser"
 	"os"
@@ -48,6 +49,7 @@ func GenerateSegments(folderPath string) ([]model.Segment, error) {
 			LogEntries: entries,
 			StartTime:  entries[0].Time,
 			EndTime:    entries[len(entries)-1].Time,
+			Index:      indexer.CreateSegmentIndex(entries),
 		}
 
 		segments = append(segments, segment)

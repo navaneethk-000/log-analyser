@@ -20,4 +20,5 @@ func main() {
 
 	segments, _ := segmenter.GenerateSegments("/home/navaneeth/project_log_parser/logs")
 	fmt.Println("Firsts entry : ", segments[0].LogEntries[0].Log)
+	fmt.Println("IndexByLevel  : ", segments[0].Index.ByLevel)
 }
