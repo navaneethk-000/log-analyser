@@ -1,8 +1,13 @@
 package parser
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"log/slog"
 	"log_parser/model"
+	"os"
+	"path/filepath"
 	"regexp"
 	"time"
 )
@@ -33,4 +38,39 @@ func ParseLogEntry(s string) (*model.LogEntry, error) {
 		Request_id: matches[r.SubexpIndex("request_id")],
 		Message:    matches[r.SubexpIndex("msg")],
 	}, nil
+}
+
+func ParseLogFiles(folderPath string) ([]model.LogEntry, error) {
+	var allEntries []model.LogEntry
+	files, err := os.ReadDir(folderPath)
+	if err != nil {
+		log.Println("Error Parsing the file", folderPath)
+		return nil, fmt.Errorf("failed to read directory : %v", err)
+	}
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		slog.Info("Parsing the file", "Name", file.Name())
+		path := filepath.Join(folderPath, file.Name())
+		f, err := os.Open(path)
+		if err != nil {
+			fmt.Printf("Skipping file %s due to error: %v\n", path, err)
+			continue
+		}
+		scanner := bufio.NewScanner(f)
+		scanner.Buffer(make([]byte, 0, 1024*1024), 10*1024*1024)
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			entry, err := ParseLogEntry(line)
+			if err == nil {
+				allEntries = append(allEntries, *entry)
+			}
+		}
+
+		f.Close()
+
+	}
+	return allEntries, nil
 }
