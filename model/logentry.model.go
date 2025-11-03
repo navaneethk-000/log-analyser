@@ -12,11 +12,11 @@ const (
 )
 
 type LogEntry struct {
-	Log        string
-	Time       time.Time
-	Level      LogLevel
-	Component  string
-	Host       string
-	Request_id string
-	Message    string
+	Log        string    `json:"log"`
+	Time       time.Time `json:"time"`
+	Level      LogLevel  `json:"level"`
+	Component  string    `json:"component"`
+	Host       string    `json:"host"`
+	Request_id string    `json:"requiest_id"`
+	Message    string    `json:"message"`
 }
