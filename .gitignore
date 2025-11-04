@@ -2,3 +2,4 @@ logs
 log_generator
 tools
 *.out
+*.json
