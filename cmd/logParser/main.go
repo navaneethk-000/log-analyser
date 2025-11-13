@@ -26,6 +26,7 @@ func main() {
 		slog.Error("Could not create output file", "error", err)
 
 	}
+	defer file.Close()
 
 	jsonData, err := json.MarshalIndent(segments, "", " ")
 	if err != nil {
@@ -38,7 +39,6 @@ func main() {
 		return
 	}
 
-	defer file.Close()
-
 	fmt.Printf("Logs parsed successfully and saved to %s\n", *outputFile)
 }
+	
