@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"log_parser/segmenter"
+	"log_parser/pkg/segmenter"
 	"os"
 )
 
@@ -41,4 +41,3 @@ func main() {
 
 	fmt.Printf("Logs parsed successfully and saved to %s\n", *outputFile)
 }
-	

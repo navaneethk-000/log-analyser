@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
-	"log_parser/cmd/helper"
-	"log_parser/filter"
+	"log_parser/cmd/logFilter/helper"
 	"log_parser/model"
-	"log_parser/segmenter"
+	"log_parser/pkg/filter"
+	"log_parser/pkg/segmenter"
 	"time"
 )
 

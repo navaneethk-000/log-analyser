@@ -3,9 +3,9 @@ package segmenter
 import (
 	"bufio"
 	"fmt"
-	"log_parser/indexer"
 	"log_parser/model"
-	"log_parser/parser"
+	"log_parser/pkg/indexer"
+	"log_parser/pkg/parser"
 	"os"
 	"path/filepath"
 	"sync"
@@ -58,11 +58,11 @@ func GenerateSegments(folderPath string) ([]model.Segment, error) {
 				EndTime:    entries[len(entries)-1].Time,
 				Index:      indexer.CreateSegmentIndex(entries),
 			}
+
 			mu.Lock()
 			segments = append(segments, segment)
 			mu.Unlock()
 		}(file)
-
 	}
 
 	wg.Wait()
