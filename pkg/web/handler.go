@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func showAllLogs(c *gin.Context) {
+func GetAllLogs(c *gin.Context) {
 	fmt.Println("show all")
 	entries, err := models.QueryDB(DB, []string{}) //empty filter to get all logs
 	fmt.Println(entries[0].Component)
@@ -32,16 +32,44 @@ func ExecuteFilterQuery(c *gin.Context) {
 	result := make(map[string][]string)
 
 	for key, values := range formData {
-		if len(values) > 0 && values[0] != "" {
-			// result[key] = strings.Split(values[0], ",")
-			result[key] = values
+		if len(values) == 0 || values[0] == "" {
+			continue
 		}
+
+		val := values[0]
+
+		if key == "filter" {
+
+			parts := strings.Split(val, " ")
+			for _, p := range parts {
+				if strings.TrimSpace(p) != "" {
+					queryParts = append(queryParts, p)
+				}
+			}
+		} else {
+			// dropdowns
+			queryParts = append(queryParts, fmt.Sprintf("%s=%s", key, val))
+		}
+
+		// if key == "filter" {
+		// 	conditions := strings.Split(val, ",")
+
+		// 	for _, cond := range conditions {
+		// 		cond = strings.TrimSpace(cond)
+		// 		if cond != "" {
+		// 			queryParts = append(queryParts, cond)
+		// 		}
+		// 	}
+		// 	continue
+		// }
+
 	}
+
 	fmt.Println(result)
 
 	for key, vals := range result {
 		if len(vals) > 0 {
-			// join multiple values into one comma string: "INFO,DEBUG"
+			// join multiple values into one comma string: "INFO,ERROR"
 			joined := strings.Join(vals, ",")
 			queryParts = append(queryParts, fmt.Sprintf("%s=%s", key, joined))
 		}

@@ -14,7 +14,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	r.LoadHTMLGlob("cmd/web/templates/*")
 
-	r.GET("/", showAllLogs)
+	r.GET("/", GetAllLogs)
 	r.POST("/filter", ExecuteFilterQuery)
 
 	return r

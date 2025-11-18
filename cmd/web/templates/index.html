@@ -14,15 +14,9 @@
         <form method="POST" action="/filter">
             <div style="display: flex; flex-direction: column;">
                 <div>
-                    <input type="text" placeholder="Enter filter parameters" name="filter"
-                        style="width:450px;height: 30px;padding-left: 20px; text-align: center;">
-
-                    <!-- <select name="" id="" style="width: fit-content;height: 35px; text-align: center;cursor: pointer;">
-                        <option value="">Select filter</option>
-                        <option value="level">Level</option>
-                        <option value="host">Host</option>
-                        <option value="component">Component</option>
-                    </select> -->
+                    <input type="text"
+                        placeholder="Enter filter (Example : time_stamp>=2025-11-17 00:29:27.313, level=ERROR)"
+                        name="filter" style="width:450px;height: 30px;padding-left: 20px; text-align: center;">
 
                     <!-- Level dropdown -->
                     <select name="level" style="height:35px;">
