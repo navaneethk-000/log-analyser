@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"log/slog"
 	"log_parser/pkg/models"
 	"log_parser/pkg/parser"
+	"log_parser/pkg/web"
 	"os"
 )
 
-// const dbUrl = "postgresql:///log_analyser_db?host=/var/run/postgresql/"
 const dbUrl = "postgresql:///log_data?host=/var/run/postgresql/"
 
 func handleCommand(args []string) error {
@@ -84,6 +85,19 @@ func handleCommand(args []string) error {
 		}
 		slog.Info("Filtering successful!", "no. of entries:", len(entries))
 		return nil
+	case "web":
+		// Connect DB
+		db, err := models.CreateDB(dbUrl)
+		if err != nil {
+			return nil
+		}
+
+		// Build router
+		r := web.SetupRouter(db)
+
+		// Start server
+		log.Println("Server running at http://localhost:8080")
+		r.Run(":8080")
 
 	default:
 		slog.Warn("Unknown command!")

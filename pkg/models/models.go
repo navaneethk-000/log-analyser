@@ -240,27 +240,27 @@ func toStringSlice(nums []uint) []string {
 	return s
 }
 
-func SplitUserFilter(input string) []string {
+func SplitFilterConditions(input string) []string {
 	var parts []string
 	current := ""
 	tokens := strings.Fields(input)
 
-	for _, tok := range tokens {
+	for _, token := range tokens {
 		// If token contains an operator, then new condition
-		if strings.Contains(tok, "=") ||
-			strings.Contains(tok, ">=") ||
-			strings.Contains(tok, "<=") ||
-			strings.Contains(tok, ">") ||
-			strings.Contains(tok, "<") {
+		if strings.Contains(token, "=") ||
+			strings.Contains(token, ">=") ||
+			strings.Contains(token, "<=") ||
+			strings.Contains(token, ">") ||
+			strings.Contains(token, "<") {
 
-			// Save previous condition
+			// To save previous condition
 			if current != "" {
 				parts = append(parts, current)
 			}
-			current = tok
+			current = token
 		} else {
 			// continuation (timestamps)
-			current += " " + tok
+			current += " " + token
 		}
 	}
 

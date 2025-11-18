@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Log Analyser</title>
+</head>
+
+<body style="padding: 80px;">
+    <div
+        style="text-align: center; display: flex; flex-direction: column;justify-content: center; align-items: center;">
+
+        <h1 style="font-size: 80px;">Log Analyser</h1>
+
+        <form method="POST" action="/filter">
+            <div style="display: flex; flex-direction: column;">
+                <div>
+                    <input type="text" placeholder="Enter filter parameters" name="filter"
+                        style="width:450px;height: 30px;padding-left: 20px; text-align: center;">
+
+                    <!-- <select name="" id="" style="width: fit-content;height: 35px; text-align: center;cursor: pointer;">
+                        <option value="">Select filter</option>
+                        <option value="level">Level</option>
+                        <option value="host">Host</option>
+                        <option value="component">Component</option>
+                    </select> -->
+
+                    <!-- Level dropdown -->
+                    <select name="level" style="height:35px;">
+                        <option value="">Select Level</option>
+                        <option value="INFO">INFO</option>
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="WARN">WARN</option>
+                    </select>
+
+                    <!-- Host dropdown -->
+                    <select name="host" style="height:35px;">
+                        <option value="">Select Host</option>
+                        <option value="cache01">cache01</option>
+                        <option value="db01">db01</option>
+                        <option value="web01">web01</option>
+                        <option value="web02">web02</option>
+                        <option value="worker01">worker01</option>
+                    </select>
+
+                    <!-- Component dropdown -->
+                    <select name="component" style="height:35px;">
+                        <option value="">Select Component</option>
+                        <option value="auth">auth</option>
+                        <option value="api-server">api-server</option>
+                        <option value="cache">cache</option>
+                        <option value="database">database</option>
+                        <option value="worker">worker</option>
+                    </select>
+                </div>
+
+                <button type="submit" style="cursor: pointer;height: 30px;">Search</button>
+
+            </div>
+        </form>
+    </div>
+
+    <div style="height: 700px; overflow: scroll;">
+        <div style="display: flex; flex-direction: column;">
+            <h2 style="text-align: center;">Filtered Results</h2>
+
+            {{ if .Error }}
+            <p style="color:red;text-align: center;">{{ .Error }}</p>
+            {{ end }}
+
+            {{ if .entries }}
+            <button>
+                <a href="/" style="text-align: center;text-decoration: none; color: 
+            black;border-style: groove; border: 1px;">Clear filters </a>
+            </button>
+
+            <table border="1" cellpadding="5">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Level</th>
+                    <th>Component</th>
+                    <th>Host</th>
+                    <th>Message</th>
+                </tr>
+
+                {{ range .entries }}
+                <tr>
+                    <td>{{ .TimeStamp }}</td>
+                    <td>{{ .Level.Level }}</td>
+                    <td>{{ .Component.Component }}</td>
+                    <td>{{ .Host.Host }}</td>
+                    <td>{{ .Message }}</td>
+                </tr>
+                {{ end }}
+            </table>
+            {{ else }}
+            <p style="text-align: center;">No results found.</p>
+            {{ end }}
+
+            <br>
+        </div>
+    </div>
+</body>
+
+</html>
