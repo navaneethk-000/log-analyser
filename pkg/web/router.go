@@ -16,6 +16,5 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	r.GET("/", GetAllLogs)
 	r.POST("/filter", ExecuteFilterQuery)
-
 	return r
 }

@@ -51,18 +51,6 @@ func ExecuteFilterQuery(c *gin.Context) {
 			queryParts = append(queryParts, fmt.Sprintf("%s=%s", key, val))
 		}
 
-		// if key == "filter" {
-		// 	conditions := strings.Split(val, ",")
-
-		// 	for _, cond := range conditions {
-		// 		cond = strings.TrimSpace(cond)
-		// 		if cond != "" {
-		// 			queryParts = append(queryParts, cond)
-		// 		}
-		// 	}
-		// 	continue
-		// }
-
 	}
 
 	fmt.Println(result)
@@ -78,11 +66,11 @@ func ExecuteFilterQuery(c *gin.Context) {
 	// Execute query
 	entries, err := models.QueryDB(DB, queryParts)
 	if err != nil {
-		c.HTML(500, "index.html", gin.H{"error": err.Error()})
+		c.JSON(500, err)
 		return
 	}
 
-	c.HTML(200, "index.html", gin.H{
+	c.JSON(200, gin.H{
 		"entries": entries,
 		"count":   len(entries),
 	})

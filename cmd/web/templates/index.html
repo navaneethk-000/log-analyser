@@ -3,97 +3,192 @@
 
 <head>
     <title>Log Analyser</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
-<body style="padding: 80px;">
-    <div
-        style="text-align: center; display: flex; flex-direction: column;justify-content: center; align-items: center;">
+<style>
+    body::-webkit-scrollbar {
+        display: none;
+    }
 
-        <h1 style="font-size: 80px;">Log Analyser</h1>
+    body {
+        background-color: #f2f2f2;
+    }
 
-        <form method="POST" action="/filter">
-            <div style="display: flex; flex-direction: column;">
-                <div>
-                    <input type="text"
-                        placeholder="Enter filter (Example : time_stamp>=2025-11-17 00:29:27.313, level=ERROR)"
-                        name="filter" style="width:450px;height: 30px;padding-left: 20px; text-align: center;">
+    div::-webkit-scrollbar {
+        display: none;
+    }
 
-                    <!-- Level dropdown -->
-                    <select name="level" style="height:35px;">
-                        <option value="">Select Level</option>
-                        <option value="INFO">INFO</option>
-                        <option value="DEBUG">DEBUG</option>
-                        <option value="ERROR">ERROR</option>
-                        <option value="WARN">WARN</option>
-                    </select>
+    button {
+        border-radius: 8px;
+        border-style: double;
+        border-color: white;
+    }
 
-                    <!-- Host dropdown -->
-                    <select name="host" style="height:35px;">
-                        <option value="">Select Host</option>
-                        <option value="cache01">cache01</option>
-                        <option value="db01">db01</option>
-                        <option value="web01">web01</option>
-                        <option value="web02">web02</option>
-                        <option value="worker01">worker01</option>
-                    </select>
+    table {
+        background-color: black;
+        color: white;
+    }
 
-                    <!-- Component dropdown -->
-                    <select name="component" style="height:35px;">
-                        <option value="">Select Component</option>
-                        <option value="auth">auth</option>
-                        <option value="api-server">api-server</option>
-                        <option value="cache">cache</option>
-                        <option value="database">database</option>
-                        <option value="worker">worker</option>
-                    </select>
+    #loading {
+        display: none;
+    }
+</style>
+
+<body class="mt-5 p-5 mb-2 bg-dark text-dark-emphasis">
+    <div class="text-center d-flex flex-column justify-content-center align-items-center">
+        <div class="d-flex flex-column">
+            <h1 id class="text-white display-1 fw-normal mb-5">Log Analyser</h1>
+
+            <form id="form">
+                <div class="d-flex flex-column">
+                    <div class="d-flex gap-3">
+                        <div>
+                            <input type="text"
+                                class="bg-dark border border-white p-3 text-white rounded-3 text-center ps-3"
+                                style="width:450px; height:30px;"
+                                placeholder="Enter Date Time (eg: 2025-11-17T00:29:26.919)" name="time_stamp">
+                            <input type="text"
+                                class="bg-dark border border-white p-3 text-white rounded-3 text-center ps-3"
+                                style="width:450px; height:30px;" placeholder="Enter the Request ID" name="request_id">
+                        </div>
+
+                        <select name="level"
+                            class="bg-dark p-2 border border-white text-white text-center d-flex rounded-3">
+                            <option value="">Select Level</option>
+                            <option value="INFO">INFO</option>
+                            <option value="DEBUG">DEBUG</option>
+                            <option value="ERROR">ERROR</option>
+                            <option value="WARN">WARN</option>
+                        </select>
+
+                        <!-- Host dropdown -->
+                        <select name="host"
+                            class="bg-dark p-2 border border-white text-white text-center d-flex rounded-3">
+                            >
+                            <option value="">Select Host</option>
+                            <option value="cache01">cache01</option>
+                            <option value="db01">db01</option>
+                            <option value="web01">web01</option>
+                            <option value="web02">web02</option>
+                            <option value="worker01">worker01</option>
+                        </select>
+
+                        <!-- Component dropdown -->
+                        <select name="component"
+                            class="bg-dark p-2 border border-white text-white text-center d-flex rounded-3">
+                            >
+                            <option value="">Select Component</option>
+                            <option value="auth">auth</option>
+                            <option value="api-server">api-server</option>
+                            <option value="cache">cache</option>
+                            <option value="database">database</option>
+                            <option value="worker">worker</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="cursor-pointer mt-2 mt-3 h-5" s>Search</button>
                 </div>
-
-                <button type="submit" style="cursor: pointer;height: 30px;">Search</button>
-
-            </div>
-        </form>
-    </div>
-
-    <div style="height: 700px; overflow: scroll;">
-        <div style="display: flex; flex-direction: column;">
-            <h2 style="text-align: center;">Filtered Results</h2>
-
-            {{ if .Error }}
-            <p style="color:red;text-align: center;">{{ .Error }}</p>
-            {{ end }}
-
-            {{ if .entries }}
-            <button>
-                <a href="/" style="text-align: center;text-decoration: none; color: 
-            black;border-style: groove; border: 1px;">Clear filters </a>
-            </button>
-
-            <table border="1" cellpadding="5">
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Level</th>
-                    <th>Component</th>
-                    <th>Host</th>
-                    <th>Message</th>
-                </tr>
-
-                {{ range .entries }}
-                <tr>
-                    <td>{{ .TimeStamp }}</td>
-                    <td>{{ .Level.Level }}</td>
-                    <td>{{ .Component.Component }}</td>
-                    <td>{{ .Host.Host }}</td>
-                    <td>{{ .Message }}</td>
-                </tr>
-                {{ end }}
-            </table>
-            {{ else }}
-            <p style="text-align: center;">No results found.</p>
-            {{ end }}
-
-            <br>
+            </form>
         </div>
     </div>
+
+    <div style="height: 700px; overflow: scroll;padding-top: 0px; border-radius: 8px;" class="text-white">
+        <div style="display: flex; flex-direction: column; padding: 80px;">
+            <h2 id="filteredResult" class="text-center d-none">Filtered Results</h2>
+
+            <div id="loading" class="text-center">Loading...</div>
+            <div id="errorBox"></div>
+
+            <button id="clearBtn" class="btn btn-transparent text-white border border-white d-none">
+                <a href="/" class="text-white text-center text-decoration-none d-block">Clear filters</a>
+            </button>
+            <div id="resultBox" class="mt-3"></div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $("#form").submit(function (event) {
+                event.preventDefault();
+
+                $("#loading").show(); // for loading spinner
+                $("#errorBox").html("");
+                $("#resultBox").html("");
+
+                $("#clearBtn").removeClass("d-none");
+                $("#filteredResult").removeClass("d-none")
+
+                $.ajax({
+                    url: "/filter",
+                    method: "POST",
+                    data: $(this).serialize(),
+
+                    success: function (response) {
+                        $("#loading").hide();
+
+                        if (!response.entries || response.entries.length === 0) {
+                            $("#resultBox").html("<p class='text-center'>No results found.</p>");
+                            return;
+                        }
+
+                        let html = `
+                            <table border="1" cellpadding="5" class="table text-white">
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Level</th>
+                                    <th>Component</th>
+                                    <th>Host</th>
+                                    <th>Request ID</th>                                    
+                                    <th>Message</th>
+                                </tr>
+                        `;
+
+                        response.entries.forEach(function (item) {
+                            // in case nested fields are missing
+                            let level = (item.Level && item.Level.Level) ? item.Level.Level : (item.level || "");
+                            let component = (item.Component && item.Component.Component) ? item.Component.Component : (item.component || "");
+                            let host = (item.Host && item.Host.Host) ? item.Host.Host : (item.host || "");
+
+                            html += `
+                                <tr>
+                                    <td>${item.TimeStamp || ""}</td>
+                                    <td>${level}</td>
+                                    <td>${component}</td>
+                                    <td>${host}</td>
+                                    <td>${item.RequestID}</td> 
+
+                                    <td>${item.Message || ""}</td>
+                                </tr>
+                            `;
+                        });
+
+                        html += "</table>";
+                        $("#resultBox").html(html);
+                    },
+
+                    error: function (xhr) {
+                        $("#loading").hide();
+                        let msg = "Error";
+                        try {
+                            msg = xhr.responseJSON?.error || xhr.statusText || xhr.responseText || msg;
+                        } catch (e) { /* ignore parse errors */ }
+                        $("#errorBox").html(`<div class="alert alert-danger text-center">${msg}</div>`);
+                    }
+                });
+            });
+
+        });
+    </script>
+
 </body>
 
 </html>
