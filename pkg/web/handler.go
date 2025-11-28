@@ -3,23 +3,118 @@ package web
 import (
 	"fmt"
 	"log_parser/pkg/models"
+	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Filter struct {
+	Level     []string `json:"level"`
+	Component []string `json:"component"`
+	Host      []string `json:"host"`
+	RequestID []string `json:"request_id"`
+	Timestamp []string `json:"timestamp"`
+}
+
+type LogsResponse struct {
+	Entries []models.Entry `json:"entries"`
+	Total   int64          `json:"total_count"`
+}
+
+type Error struct {
+	Error string `json:"error"`
+}
+
+func FilterPaginatedLogs(c *gin.Context) {
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "0"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "100"))
+
+	var filter Filter
+	if err := c.ShouldBindJSON(&filter); err != nil {
+		if err.Error() != "EOF" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+
+		}
+	}
+
+	// fmt.Printf("filters %#v \n", filter)
+
+	offset := page * pageSize
+
+	var entries []models.Entry
+	var total int64
+
+	// start base DB for count and for retrieval
+	countQuery := DB.Model(&models.Entry{})
+	db := DB.
+		Model(&models.Entry{}).
+		Preload("Level").
+		Preload("Component").
+		Preload("Host")
+
+	if len(filter.Level) > 0 {
+		// Use the alias GORM creates for the join ("Level"), not the actual table name log_levels
+		db = db.Joins("Level").Where(`"Level"."level" IN ?`, filter.Level)
+		countQuery = countQuery.Joins("Level").Where(`"Level"."level" IN ?`, filter.Level)
+	}
+
+	if len(filter.Host) > 0 {
+		// Use the alias GORM creates for the join ("Host"), not the actual table name log_levels
+		db = db.Joins("Host").Where(`"Host"."host" IN ?`, filter.Host)
+		countQuery = countQuery.Joins("Host").Where(`"Host"."host" IN ?`, filter.Host)
+	}
+	if len(filter.Component) > 0 {
+		// Use the alias GORM creates for the join ("Component"), not the actual table name log_levels
+		db = db.Joins("Component").Where(`"Component"."component" IN ?`, filter.Component)
+		countQuery = countQuery.Joins("Component").Where(`"Component"."component" IN ?`, filter.Component)
+	}
+	if len(filter.RequestID) > 0 {
+		db = db.Where(`entries.request_id IN ?`, filter.RequestID)
+		countQuery = countQuery.Where(`entries.request_id IN ?`, filter.RequestID)
+	}
+
+	// count with same filters
+	if err := countQuery.Count(&total).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := db.Order("entries.id ASC").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&entries).Error
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &Error{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, &LogsResponse{
+		Entries: entries,
+		Total:   total,
+	})
+	fmt.Println("page:", page, "pageSize:", pageSize, "offset:", offset)
+
+}
 
 func GetAllLogs(c *gin.Context) {
 	fmt.Println("show all")
 	entries, err := models.QueryDB(DB, []string{}) //empty filter to get all logs
 	fmt.Println(entries[0].Component)
 	if err != nil {
-		c.HTML(500, "index.html", gin.H{"error": err.Error()})
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.HTML(200, "index.html", gin.H{
+	c.JSON(200, gin.H{
 		"entries": entries,
-		"count":   len(entries),
+		// "count":   len(entries),
 	})
 }
 
