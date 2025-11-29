@@ -15,7 +15,8 @@ type Filter struct {
 	Component []string `json:"component"`
 	Host      []string `json:"host"`
 	RequestID []string `json:"request_id"`
-	Timestamp []string `json:"timestamp"`
+	StartTime string   `json:"startTime"`
+	EndTime   string   `json:"endTime"`
 }
 
 type LogsResponse struct {
@@ -41,14 +42,11 @@ func FilterPaginatedLogs(c *gin.Context) {
 		}
 	}
 
-	// fmt.Printf("filters %#v \n", filter)
-
 	offset := page * pageSize
 
 	var entries []models.Entry
 	var total int64
 
-	// start base DB for count and for retrieval
 	countQuery := DB.Model(&models.Entry{})
 	db := DB.
 		Model(&models.Entry{}).
@@ -57,24 +55,29 @@ func FilterPaginatedLogs(c *gin.Context) {
 		Preload("Host")
 
 	if len(filter.Level) > 0 {
-		// Use the alias GORM creates for the join ("Level"), not the actual table name log_levels
 		db = db.Joins("Level").Where(`"Level"."level" IN ?`, filter.Level)
 		countQuery = countQuery.Joins("Level").Where(`"Level"."level" IN ?`, filter.Level)
 	}
 
 	if len(filter.Host) > 0 {
-		// Use the alias GORM creates for the join ("Host"), not the actual table name log_levels
 		db = db.Joins("Host").Where(`"Host"."host" IN ?`, filter.Host)
 		countQuery = countQuery.Joins("Host").Where(`"Host"."host" IN ?`, filter.Host)
 	}
 	if len(filter.Component) > 0 {
-		// Use the alias GORM creates for the join ("Component"), not the actual table name log_levels
 		db = db.Joins("Component").Where(`"Component"."component" IN ?`, filter.Component)
 		countQuery = countQuery.Joins("Component").Where(`"Component"."component" IN ?`, filter.Component)
 	}
 	if len(filter.RequestID) > 0 {
 		db = db.Where(`entries.request_id IN ?`, filter.RequestID)
 		countQuery = countQuery.Where(`entries.request_id IN ?`, filter.RequestID)
+	}
+
+	if filter.StartTime != "" && filter.EndTime != "" {
+		db = db.Where("time_stamp BETWEEN ? AND ?", filter.StartTime, filter.EndTime)
+	} else if filter.StartTime != "" {
+		db = db.Where("time_stamp >= ?", filter.StartTime)
+	} else if filter.EndTime != "" {
+		db = db.Where("time_stamp <= ?", filter.EndTime)
 	}
 
 	// count with same filters
@@ -114,7 +117,6 @@ func GetAllLogs(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"entries": entries,
-		// "count":   len(entries),
 	})
 }
 

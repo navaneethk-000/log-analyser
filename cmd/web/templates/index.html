@@ -180,7 +180,7 @@
                         let msg = "Error";
                         try {
                             msg = xhr.responseJSON?.error || xhr.statusText || xhr.responseText || msg;
-                        } catch (e) { /* ignore parse errors */ }
+                        } catch (e) { }
                         $("#errorBox").html(`<div class="alert alert-danger text-center">${msg}</div>`);
                     }
                 });

@@ -66,12 +66,12 @@ func (e Entry) String() string {
 
 func CreateDB(dbUrl string) (*gorm.DB, error) {
 	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Info, // Log level (Silent, Error, Warn, Info)
-			IgnoreRecordNotFoundError: false,       // Ignore ErrRecordNotFound error
-			Colorful:                  true,        // Enable color
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: false,
+			Colorful:                  true,
 		},
 	)
 
